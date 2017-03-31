@@ -6,34 +6,53 @@
     </head>
     <body>
         <div id="root">
-
-            <div :is="currentView">
-
-            </div>
-
+            <button @click="changeComps">click me</button>
+            <one v-if="myTurn"></one>
+            <two v-else></two>
         </div>
 
 
         <script src="https://unpkg.com/vue"></script>
         <script>
-        var Child = {
-            name: "child-temp",
-            template: "<h1>I'm a child!</h1>"
-        }
+        Vue.component('one', {
+            template: `
+            <div>
+                <p>One</p>
+                <input type="text" v-model="message">
+                <p>{{message}}</p>
+            </div>
+            `,
+            data: function() {
+                return {
+                    message: ""
+                };
+            }
+        });
 
-        var OtherChild = {
-            name: "other-child",
-            template: "<h1>...And I'm the Other one!</h1>"
-        }
+        Vue.component('two', {
+            template: `
+            <div>
+                <p>Two</p>
+                <input type="text" v-model="message">
+                <p>{{message}}</p>
+            </div>
+            `,
+            data: function() {
+                return {
+                    message: ""
+                };
+            }
+        });
 
         new Vue({
             el: "#root",
             data: {
-                currentView: "otherChild"
+                myTurn: true
             },
-            components: {
-                child: Child,
-                otherChild: OtherChild
+            methods: {
+                changeComps: function() {
+                    this.myTurn = !this.myTurn;
+                }
             }
         });
         </script>

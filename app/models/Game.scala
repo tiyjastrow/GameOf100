@@ -1,3 +1,7 @@
+package models
+
+import java.util
+
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
@@ -13,7 +17,7 @@ class Game {
     "player3" -> 0,
     "player4" -> 0)
 
-  var cat: ListBuffer[Card]
+  var cat: util.ArrayList[Card] = new util.ArrayList[Card]()
   var currentBidder: Player = _
   var winningBidder: Player = _
   var winningBid: Int = 0
@@ -23,10 +27,10 @@ class Game {
   var currentRound: Int = 1
 
 
-  var allPlayers: ListBuffer[Player]
+  var allPlayers: ListBuffer[Player] = ListBuffer[Player]()
   allPlayers.+=(player1, player2, player3, player4)
 
-  var activePlayers: ListBuffer[Player]
+  var activePlayers: ListBuffer[Player] = ListBuffer[Player]()
   activePlayers = allPlayers
 
   var playerTurn: Int = 2
@@ -49,7 +53,8 @@ class Game {
     player2.setHand(Deck.dealMany(12))
     player3.setHand(Deck.dealMany(12))
     player4.setHand(Deck.dealMany(12))
-    Deck.dealMany(5).forEach(card => cat += card)
+    cat = Deck.dealMany(5)
+
   }
 
   def evaluateBid(currentBidder: Player, bid: Int): Unit = {
@@ -75,7 +80,7 @@ class Game {
   }
 
   def passCards(cards: ListBuffer[Card], targetPlayer: Player): Unit = {
-    targetPlayer.addToHand(cards)
+    cards.foreach(targetPlayer.addCard(_))
   }
 
   def discard(player: Player, cards: ListBuffer[Card]): Unit = {
