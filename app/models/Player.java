@@ -1,25 +1,19 @@
-package models;
-
 import java.util.ArrayList;
+import java.util.List;
 
 public class Player {
 
     ArrayList<Card> playersHand = new ArrayList<>();
-
-    int playerName; // indicates player 1, player 2, etc...
-
+    int playerNumber;
+    String playerName;
     int bid;
-
     Player teammate;
 
     public Player() {
     }
 
-    public Player(ArrayList<Card> playersHand, int playerName, int bid, Player teammate) {
-        this.playersHand = playersHand;
-        this.playerName = playerName;
-        this.bid = bid;
-        this.teammate = teammate;
+    public Player(int playerNumber) {
+        this.playerNumber = playerNumber;
     }
 
     public ArrayList<Card> getHand() {
@@ -30,11 +24,11 @@ public class Player {
         this.playersHand = playersHand;
     }
 
-    public int getPlayerName() {
+    public String getPlayerName() {
         return playerName;
     }
 
-    public void setPlayerName(int playerName) {
+    public void setPlayerName(String playerName) {
         this.playerName = playerName;
     }
 
@@ -58,10 +52,6 @@ public class Player {
         playersHand.addAll(cat);
     }
 
-    public void passCards(ArrayList<Card> passedCards) {
-        playersHand.removeAll(passedCards);
-    }
-
     public void takeCards(ArrayList<Card> passedCards) {
         playersHand.addAll(passedCards);
     }
@@ -69,6 +59,16 @@ public class Player {
     public void addCard( Card card) {
         playersHand.add(card);
     }
+
+    public void addCards(ArrayList<Card> cards){
+        playersHand.addAll(cards);
+    }
+
+    public void removeCards(List<Card> cards){
+        playersHand.removeAll(cards);
+    }
+
+    public void removeCard(Card card) {playersHand.remove(card);}
 
     //method to handle when players discard from original hand of 12 down to 6 card-->activeHand
     //cards discarded are simply deleted (go to garbage pile)
