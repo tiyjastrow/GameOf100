@@ -31,9 +31,13 @@ class Form {
         return data;
     }
 
-    submit(url) {
+    submit(url, params) {
+        var data = this.getData();
+        if (params) {
+            data = {params: params, data: data};
+        }
         return new Promise((resolve, reject) => {
-            axios.post(url, this.getData())
+            axios.post(url, data)
                 .then(response => {
                     this.onSuccess(response.data);
                     resolve(response.data);
@@ -102,9 +106,12 @@ const globalData = {
         3: new Player(3),
         4: new Player(4)
     },
+    name: "Matthew",
+    game: "",
     user: undefined,
     leader: undefined,
-    trump: 0
+    trump: 0,
+    currentPlayerTurn: undefined
 };
 
 Vue.component('cheat-sheet', {
@@ -203,12 +210,11 @@ Vue.component('scoreboard', {
     },
     methods: {
         getScoreboard: function() {
-            var compThis = this;
-            axios.get('/scoreboard')
+            axios.get('/scoreboard', {params: {game: this.$root.$data.global.game}})
                 .then(response => {
-                    compThis.team1Score = response.data.team1Score;
-                    compThis.team2Score = response.data.team2Score;
-                    compThis.runningScoreInfo = response.data.runningScoreInfo;
+                    this.team1Score = response.data.team1Score;
+                    this.team2Score = response.data.team2Score;
+                    this.runningScoreInfo = response.data.runningScoreInfo;
                 });
             this.scoreboardCheck = setTimeout(this.getScoreboard, 5000);
         }
@@ -221,7 +227,7 @@ Vue.component('bid-grid', {
     <div class="col-md-4 col-md-offset-4">
         <bid-box v-for="player in players" :player="player" :currentBidder="currentBidder" ></bid-box>
     </div>
-    `,
+    `
 });
 
 Vue.component('bid-box', {
@@ -265,7 +271,8 @@ Vue.component('bid-box', {
     methods: {
         submitBid: function() {
             this.unclickable = true;
-            this.bidForm.submit("/bid")
+            // ajax found in Form class submit(route, params)
+            this.bidForm.submit("/bid", {game: this.$root.$data.global.game, player: this.$root.$data.global.user.number})
                 .catch(error => {
                     this.unclickable = false;
                 });
@@ -277,39 +284,52 @@ Vue.component('bid-box', {
     }
 });
 
-// I made interactable on for reduce, DIFFERENTIATE FOR REDUCE AND PLAY
 Vue.component('hand', {
-    props: {
-        interactable: {
-            type: Boolean,
-            required: true
-        }
-    },
     template: `
     <div class="row" style="position: absolute; bottom: 0px; width: 1200px">
         <div class="col-md-10 col-md-offset-1" style="background-color: green; padding: 10px 0px 10px 0px">
-            <div v-if="interactable">
-                <img v-for="card in hand" :class="card.name" class="card clickable" @click="addToDiscard(card)">
+            <div v-if="reduce">
+                <img v-for="card in hand" :class="[card.name, {discard: inDiscard(card)}, {play: chosenCard(card)}]" class="card clickable" @click="addToDiscard(card)">
                 <button :disabled="discardIsEmpty" @click="discard()">Discard</button>
             </div>
-            <img v-else v-for="card in hand" :class="card.name" class="card">
+
+            <img v-if="bidding" v-for="card in hand" :class="card.name" class="card">
+
+            <div v-if="play">
+                <div v-if="myTurn">
+                    <img v-for="card in hand" :class="card.name" class="card clickable" @click="choseToPlay(card)">
+                    <button :disabled="cardToPlay == undefined" @click="playCard">Play</button>
+                </div>
+
+                <img v-else v-for="card in hand" :class="card.name" class="card">
+            </div>
         </div>
     </div>
     `,
     data: function() {
         return {
             hand: [],
-            trump: this.$root.$data.global.trump,
+            global: this.$root.$data.global,
             discardPile: [],
+            cardToPlay: undefined
         };
     },
     mounted: function() {
-        axios.get('/hand')
+        axios.get('/hand', {params: {game: this.$root.$data.global.game, player: this.$root.$data.global.user.number}})
             .then(response => {
                 this.loadHand(response.data.hand);
             });
+        if (this.global.stage == "play") {
+            this.getTurn();
+        }
     },
     methods: {
+        inDiscard: function(card) {
+            return this.discardPile.find(c => c === card);
+        },
+        chosenCard: function(card) {
+            return this.cardToPlay == card;
+        },
         addToDiscard: function(card) {
             var index = this.discardPile.indexOf(card);
             if (index > -1) {
@@ -320,7 +340,14 @@ Vue.component('hand', {
         },
         discard: function() {
             this.discardPile = [];
-            axios.post('/discard', this.discardPile)
+            axios.post('/discard',
+                {
+                    params: {
+                        game: this.global.game,
+                        player: this.global.user.number
+                    },
+                    data: this.discardPile
+                })
                 .then(response => {
                     this.loadHand(response.data.hand);
                 });
@@ -330,11 +357,53 @@ Vue.component('hand', {
             hand.forEach(card => {
                 this.hand.push(new Card(card.name, card.rank, card.suit));
             });
+        },
+        getTurn: function() {
+
+        },
+        choseToPlay: function(card) { // add to card to play unless the card is already there, remove instead
+            if (this.cardToPlay == card) {
+                this.cardToPlay = undefined;
+            } else {
+                this.cardToPlay = card;
+            }
+        },
+        playCard: function() {
+            if (cardToPlay !== undefined) {
+                axios.post('/play-card',
+                    {
+                        params: {
+                            game: this.global.game,
+                            player: this.global.user.number
+                        },
+                        data: this.cardToPlay
+                    })
+                    .then(response => {
+                        var index = this.hand.indexOf(this.cardToPlay);
+                        this.hand.splice(index, 1);
+                        this.cardToPlay = undefined;
+                    })
+                    .catch(error => {
+                        this.cardToPlay = undefined;
+                    });
+            }
         }
     },
     computed: {
         discardIsEmpty: function() {
             return this.discardPile.length === 0;
+        },
+        bidding: function() {
+            return this.global.stage == "bidding";
+        },
+        reduce: function() {
+            return this.global.stage == "reduce";
+        },
+        play: function() {
+            return this.global.stage == "play";
+        },
+        myTurn: function() {
+            return this.global.currentPlayerTurn == this.global.user;
         }
     }
 });
@@ -346,11 +415,10 @@ Vue.component('cat', {
     </div>
     `,
     mounted: function() {
-        var compThis = this;
-        axios.get('/cat')
+        axios.get('/cat', {params: {game: this.$root.$data.global.game}})
             .then(response => {
                 response.data.cat.forEach(card => {
-                    compThis.cat.push(new Card(card.name, card.rank, card.suit));
+                    this.cat.push(new Card(card.name, card.rank, card.suit));
                 });
             });
     },
@@ -360,6 +428,56 @@ Vue.component('cat', {
         };
     }
 });
+//Todo
+Vue.component('play', {
+    template: `
+    <div class="col-md-4 col-md-offset-4">
+        <img :class="play[1].name" class="card"><br>
+        <img :class="play[2].name" class="card" style="display: inline-block">
+        <img class="trump clubs" style="display: inline-block; margin: 10px; position: relative">
+        <h4 style="position: absolute; top: 150px; left: 0; width: 100%">
+            <span style="background-color: white; padding: 2px">
+                18
+            </span>
+        </h4>
+        <img :class="play[3].name" class="card" style="display: inline-block"><br>
+        <img :class="play[4].name" class="card">
+    </div>
+    `,
+    data: function() {
+        return {
+            score: 0,
+            play: {
+                1: undefined,
+                2: undefined,
+                3: undefined,
+                4: undefined
+            },
+            playCheck: undefined
+        };
+    },
+    mounted: function() {
+        this.getPlay();
+    },
+    beforeDestroy: function() {
+        clearTimeout(this.playCheck);
+    },
+    methods: {
+        getPlay: function() {
+            axios.get('/play', {params: {game: this.$root.$data.global.game}})
+                .then(response => {
+                    var play = response.data.play;
+                    for (var card in play) {
+                        this.play[card] = new Card(play[card].name,
+                                                    play[card].rank,
+                                                    play[card].suit);
+                    }
+                    this.score = response.data.score;
+                });
+            this.playCheck = setTimeout(this.getPlay, 5000);
+        }
+    }
+});
 
 var loginComp = {
     template: `
@@ -367,7 +485,7 @@ var loginComp = {
         <div class="form-group">
             <label for="username" class="col-md-1 col-md-offset-2 control-label">Name</label>
             <div class="col-md-6">
-                <input type="text" class="form-control" v-model="joinGame.username" placeholder="Enter a unique name" required>
+                <input type="text" class="form-control" v-model="joinGame.name" placeholder="Enter a unique name" required>
             </div>
         </div>
         <div class="form-group">
@@ -388,12 +506,12 @@ var loginComp = {
     `,
     data: function() {
         return {
-            joinGame: new Form({
-                name: '',
-                game: ''
-            }),
             games: [],
-            global: this.$root.$data.global
+            global: this.$root.$data.global,
+            joinGame: new Form({
+                name: this.$root.$data.global.name,
+                game: ''
+            })
         };
     },
     mounted: function() {
@@ -407,6 +525,8 @@ var loginComp = {
             this.joinGame.submit("/join-game")
                 .then(data => {
                     this.global.user = this.global.players[data.user];
+                    this.global.name = data.name;
+                    this.global.game = data.game;
                     this.global.stage = "connecting";
                 });
         }
@@ -417,7 +537,6 @@ var connectingComp = {
     template: `
         <div>
             <h1 v-for="player in global.players">{{player.name}}: {{player.connected}}</h1>
-
         </div>
     `,
     data: function() {
@@ -427,6 +546,7 @@ var connectingComp = {
         };
     },
     mounted: function() {
+        axios.post('/connected', {params: {game: this.global.game, player: this.global.user.number}});
         this.updateConnection();
     },
     beforeDestroy: function() {
@@ -435,16 +555,15 @@ var connectingComp = {
     },
     methods: {
         updateConnection: function() {
-            var thisComp = this;
-            axios.get('/players')
-                .then(function(response) {
-                    response.data.forEach(function(player) {
-                        var currentPlayer = thisComp.global.players[player.number];
+            axios.get('/players', {params: {game: this.global.game}})
+                .then(response => {
+                    response.data.forEach(player => {
+                        var currentPlayer = this.global.players[player.number];
                         currentPlayer.name = player.name;
                         currentPlayer.connected = player.connected;
                     });
                 });
-            this.connectCheck = setTimeout(this.updateConnection, 3000);
+            this.connectCheck = setTimeout(this.updateConnection, 5000);
         }
     },
     computed: {
@@ -498,19 +617,18 @@ var biddingComp = {
     },
     methods: {
         updateBid: function() {
-            var thisComp = this;
-            axios.get('/bid-info')
-                .then(function(response) { // response data should have player bids, current bidder, winning bidder, winning bid
+            axios.get('/bid-info', {params: {game: this.global.game}})
+                .then(response => { // response data should have player bids, current bidder, winning bidder, winning bid
                     if (response.data.hasOwnProperty("winner")) {
                         // set leader from bid winner
-                        thisComp.global.leader = thisComp.global.players[response.data.winner];
-                        thisComp.global.stage = "reduce";
+                        this.global.leader = this.global.players[response.data.winner];
+                        this.global.stage = "reduce";
                         return;
                     }
 
-                    thisComp.currentBidder = thisComp.global.players[response.data.currentBidder];
-                    response.data.playerBids.forEach(function(player){
-                        thisComp.global.players[player.number].bid = player.bid;
+                    this.currentBidder = this.global.players[response.data.currentBidder];
+                    response.data.playerBids.forEach(player => {
+                        this.global.players[player.number].bid = player.bid;
                     });
                 });
             this.bidCheck = setTimeout(this.updateBid, 5000);
@@ -539,22 +657,17 @@ var reduceComp = {
     },
     methods: {
         postReady: function() {
-            var compThis = this;
-            axios.post('/ready')
+            axios.post('/ready', {params: {game: this.global.game, player: this.global.user.number}})
                 .then(response => {
-                    compThis.ready = true;
-                    compThis.waitForOthers();
-                })
-                .catch(error => {
-
+                    this.ready = true;
+                    this.waitForOthers();
                 });
         },
         waitForOthers: function() {
-            var compThis = this;
-            axios.get('/ready')
+            axios.get('/ready', {params: {game: this.global.game}})
                 .then(response => {
                     if (response.data.ready) {
-                        compThis.global.stage = "play";
+                        this.global.stage = "play";
                         return;
                     }
                 });
@@ -571,12 +684,66 @@ var playComp = {
         <div>
             <cheat-sheet></cheat-sheet>
             <scoreboard></scoreboard>
-
+            <play></play>
             <hand></hand>
         </div>
-    `
+    `,
+    data: function() {
+        return {
+            global: this.$root.$data.global,
+            turnCheck: undefined
+        };
+    },
+    mounted: function() {
+        this.getTurn();
+    },
+    beforeDestroy: function() {
+        clearTimeout(this.turnCheck);
+    },
+    methods: {
+        getTurn: function() {
+            axios.get('/player-turn', {params: {game: this.global.game}}) // handles player turn and whether the play round is over
+                .then(response => {
+                    if (response.data.roundOver) {
+                        this.global.stage = "end";
+                        return;
+                    }
+                    var playerNumber = response.data.player;
+                    this.global.currentPlayerTurn = this.global.players[playerNumber];
+                });
+            this.turnCheck = setTimeout(this.getTurn, 5000);
+        }
+    }
 };
 
+var endComp = { // if end of game to login stage, if end of round to connecting stage
+    template: `
+        <button v-if="endOfGame" @click="newGame" >New Game</button>
+        <button v-else @click="nextRound" >Next Round</button>
+    `,
+    data: function() {
+        return {
+            endOfGame: false,
+            global: this.$root.$data.global
+        };
+    },
+    mounted: function() {
+        axios.get('/round-info', {params: {game: this.global.game}})
+            .then(response => {
+                this.endOfGame = response.data.endOfGame;
+            });
+    },
+    methods: {
+        newGame: function() {
+            axios.post('/new-game', {params: {game: this.global.game, player: this.global.user.number}});
+        },
+        nextRound: function() {
+            axios.post('/next-round', {params: {game: this.global.game, player: this.global.user.number}});
+        }
+    }
+};
+
+// need to figure out how to handle reconnect on next round and not letting new people join
 new Vue({
     el: '#root',
     data: {
@@ -587,6 +754,7 @@ new Vue({
         connecting: connectingComp,
         bidding: biddingComp,
         reduce: reduceComp,
-        play: playComp
+        play: playComp,
+        end: endComp
     }
 });

@@ -1,13 +1,4 @@
-//Ace = 1 point
-//        King and Opposite King = 25
-//        Queen = 0
-//        Jack's = 1 point each
-//        10 = 1
-//        9's = 9 each
-//        5's = 5 each
-//        2 = 1
-//        Joker = 17 points
-//        All other cards have zero points
+package models;
 
 public class Card {
     String name;
