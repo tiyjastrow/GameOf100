@@ -1,7 +1,19 @@
+package models;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import models.Card;
+
 public class Player {
+
+    public ArrayList<Card> getPlayersHand() {
+        return playersHand;
+    }
+
+    public void setPlayersHand(ArrayList<Card> playersHand) {
+        this.playersHand = playersHand;
+    }
 
     ArrayList<Card> playersHand = new ArrayList<>();
     int playerNumber;
@@ -10,6 +22,14 @@ public class Player {
     Player teammate;
 
     public Player() {
+    }
+
+    public int getPlayerNumber() {
+        return playerNumber;
+    }
+
+    public void setPlayerNumber(int playerNumber) {
+        this.playerNumber = playerNumber;
     }
 
     public Player(int playerNumber) {

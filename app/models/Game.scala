@@ -1,4 +1,7 @@
 import java.util
+import java.util.function.Consumer
+
+import models.{Card, Deck, Player}
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -17,18 +20,17 @@ class Game {
     "player3" -> 0,
     "player4" -> 0)
 
-  var cat: ListBuffer[Card] = _
-  var currentBidder: Player = _
-  var winningBidder: Player = _
+  var cat = new ListBuffer[Card]
+  var currentBidder = new Player
+  var winningBidder = new Player
   var winningBid: Int = 61
 
-  var leader: Player = _
-  var trump: Int = _
+  var leader = new Player
+  var trump = 0
   var currentRound: Int = 1
 
 
-  val allPlayers: ListBuffer[Player] = _
-  allPlayers.+=(player1, player2, player3, player4)
+  val allPlayers = ListBuffer(player1, player2, player3, player4)
 
   var activePlayers: ListBuffer[Player] = allPlayers
 
@@ -48,7 +50,9 @@ class Game {
     player2.setHand(deck.deal(12))
     player3.setHand(deck.deal(12))
     player4.setHand(deck.deal(12))
-    deck.deal(5).forEach(card => cat += card)
+    cat = deck.deal(5).asInstanceOf
+//    cat = for ( card <- deck.deal(5) ) yield card
+//    deck.deal(5).asInstanceOf[Consumer[_ >: models.Card]].forEach((card: Card) => cat += card)
   }
 
   //if first 3 players bid -1, player 1 autobids 62 and wins bid todo: implement this comment if needed
@@ -68,48 +72,28 @@ class Game {
   }
 
   def passCards(cards: ListBuffer[Card], targetPlayer: Player, passingPlayer: Player): Unit = {
-    targetPlayer.addCards(convertListBufferToArrayList(cards))
-    passingPlayer.removeCards(convertListBufferToArrayList(cards))
+    targetPlayer.addCards(cards.asInstanceOf)
+    passingPlayer.removeCards(cards.asInstanceOf)
   }
 
   def checkIfTrumpOrOp(card: Card): Boolean = {
-    var isTrumpOrOp: Boolean = null.asInstanceOf[Boolean]
-    if (card.rank == 0 || card.rank == 5 || card.rank == 9 || card.rank == 11 || card.rank == 13) {
-      if (trump == 1 || trump == 4) {
-        isTrumpOrOp = card.suit == 1 || card.suit == 4
-      }
-      if (trump == 2 || trump == 3) {
-        isTrumpOrOp = card.suit == 2 || card.suit == 3
-      }
-    }
-    isTrumpOrOp
+    val isOppositeRank = List(0, 5, 9, 11, 13).contains(card.getRank)
+    val isBlackTrump = List(1, 4).contains(trump)
+    (card.isJoker
+      || (card.getSuit == trump)
+      || (isOppositeRank && (isBlackTrump && card.isBlack) || (!isBlackTrump && !card.isBlack))
+      )
   }
 
   def discardCards(playerInt: Int, cardsInfo: ListBuffer[String]): Unit = {
-    val player: Player = allPlayers.filter(_.playerNumber == playerInt).asInstanceOf[Player]
-    val playersHand: ListBuffer[Card] = convertArrayListToListBuffer(player.playersHand)
+    val player: Player = allPlayers.filter(_.getPlayerNumber == playerInt).asInstanceOf[Player]
+    val playersHand: ListBuffer[Card] = player.getPlayersHand.asInstanceOf
     var cards: ListBuffer[Card] = null.asInstanceOf[ListBuffer[Card]]
     for (s <- cardsInfo) {
-      val card: Card = playersHand.filter(_.name == s).asInstanceOf[Card]
+      val card: Card = playersHand.filter(_.getName == s).asInstanceOf[Card]
 
-      if(!checkIfTrumpOrOp(card)) cards.+=(card)
+      if (!checkIfTrumpOrOp(card)) cards.+=(card)
     }
-    player.removeCards(convertListBufferToArrayList(cards))
-  }
-
-  def convertListBufferToArrayList(lb: ListBuffer[Card]): util.ArrayList[Card] = {
-    var tempList = new util.ArrayList[Card]
-    for (c <- lb) {
-      tempList.add(c)
-    }
-    tempList
-  }
-
-  def convertArrayListToListBuffer(al: util.ArrayList[Card]): ListBuffer[Card] = {
-    var tempList: ListBuffer[Card] = null.asInstanceOf[ListBuffer[Card]]
-    for (c <- al) {
-      tempList.+=(c)
-    }
-    tempList
+    player.removeCards(cards.asInstanceOf)
   }
 }

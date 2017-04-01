@@ -1,3 +1,7 @@
+package models;
+
+import models.Card;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
