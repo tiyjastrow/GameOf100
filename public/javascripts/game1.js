@@ -116,7 +116,7 @@ const globalData = {
 
 Vue.component('cheat-sheet', {
     template: `
-    <div class="col-md-2" style="background-color: black; opacity: 0.5; color: white">
+    <div v-once class="col-md-2" style="background-color: black; opacity: 0.5; color: white">
         <h4>Cheat Sheet</h4>
         Ace: 1<br>
         King/Opposite King: 25<br>
@@ -289,15 +289,15 @@ Vue.component('hand', {
     <div class="row" style="position: absolute; bottom: 0px; width: 1200px">
         <div class="col-md-10 col-md-offset-1" style="background-color: green; padding: 10px 0px 10px 0px">
             <div v-if="reduce">
-                <img v-for="card in hand" :class="[card.name, {discard: inDiscard(card)}, {play: chosenCard(card)}]" class="card clickable" @click="addToDiscard(card)">
-                <button :disabled="discardIsEmpty" @click="discard()">Discard</button>
+                <img v-for="card in hand" :class="[card.name, {discard: inDiscard(card)}]" class="card clickable" @click="addToDiscard(card)">
+                <button :disabled="discardIsEmpty" @click="discard">Discard</button>
             </div>
 
             <img v-if="bidding" v-for="card in hand" :class="card.name" class="card">
 
             <div v-if="play">
                 <div v-if="myTurn">
-                    <img v-for="card in hand" :class="card.name" class="card clickable" @click="choseToPlay(card)">
+                    <img v-for="card in hand" :class="[card.name, {play: chosenCard(card)}]" class="card clickable" @click="chooseToPlay(card)">
                     <button :disabled="cardToPlay == undefined" @click="playCard">Play</button>
                 </div>
 
@@ -328,7 +328,7 @@ Vue.component('hand', {
             return this.discardPile.find(c => c === card);
         },
         chosenCard: function(card) {
-            return this.cardToPlay == card;
+            return this.cardToPlay === card;
         },
         addToDiscard: function(card) {
             var index = this.discardPile.indexOf(card);
@@ -361,7 +361,7 @@ Vue.component('hand', {
         getTurn: function() {
 
         },
-        choseToPlay: function(card) { // add to card to play unless the card is already there, remove instead
+        chooseToPlay: function(card) { // add to card to play unless the card is already there, remove instead
             if (this.cardToPlay == card) {
                 this.cardToPlay = undefined;
             } else {
@@ -369,7 +369,7 @@ Vue.component('hand', {
             }
         },
         playCard: function() {
-            if (cardToPlay !== undefined) {
+            if (this.cardToPlay !== undefined) {
                 axios.post('/play-card',
                     {
                         params: {
@@ -428,30 +428,32 @@ Vue.component('cat', {
         };
     }
 });
-//Todo
+
 Vue.component('play', {
     template: `
-    <div class="col-md-4 col-md-offset-4">
-        <img :class="play[1].name" class="card"><br>
-        <img :class="play[2].name" class="card" style="display: inline-block">
-        <img class="trump clubs" style="display: inline-block; margin: 10px; position: relative">
-        <h4 style="position: absolute; top: 150px; left: 0; width: 100%">
-            <span style="background-color: white; padding: 2px">
-                18
-            </span>
-        </h4>
-        <img :class="play[3].name" class="card" style="display: inline-block"><br>
-        <img :class="play[4].name" class="card">
+    <div class="row">
+        <div class="col-md-4 col-md-offset-4">
+            <img :class="play[0].name" class="card"><br>
+            <img :class="play[1].name" class="card" style="display: inline-block">
+            <img class="trump clubs" style="display: inline-block; margin: 10px; position: relative">
+            <h4 style="position: absolute; top: 150px; left: 0; width: 100%">
+                <span style="background-color: white; padding: 2px">
+                    {{score}}
+                </span>
+            </h4>
+            <img :class="play[2]" class="card" style="display: inline-block"><br>
+            <img :class="play[3]" class="card">
+        </div>
     </div>
     `,
     data: function() {
         return {
             score: 0,
             play: {
-                1: undefined,
-                2: undefined,
-                3: undefined,
-                4: undefined
+                0: new Card(),
+                1: new Card(),
+                2: new Card(),
+                3: new Card()
             },
             playCheck: undefined
         };
@@ -468,9 +470,7 @@ Vue.component('play', {
                 .then(response => {
                     var play = response.data.play;
                     for (var card in play) {
-                        this.play[card] = new Card(play[card].name,
-                                                    play[card].rank,
-                                                    play[card].suit);
+                        this.play[card].name = play[card].name;
                     }
                     this.score = response.data.score;
                 });
@@ -742,7 +742,6 @@ var endComp = { // if end of game to login stage, if end of round to connecting 
         }
     }
 };
-
 // need to figure out how to handle reconnect on next round and not letting new people join
 new Vue({
     el: '#root',
