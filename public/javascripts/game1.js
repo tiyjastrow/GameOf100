@@ -535,7 +535,7 @@ var loginComp = {
 
 var connectingComp = {
     template: `
-        <div>
+        <div class="container">
             <h1 v-for="player in global.players">{{player.name}}: {{player.connected}}</h1>
         </div>
     `,
@@ -592,20 +592,23 @@ var connectingComp = {
 
 var biddingComp = {
     template: `
+    <div class="container">
         <div class="row">
             <cheat-sheet></cheat-sheet>
             <banner :player="currentBidder"></banner>
             <scoreboard></scoreboard>
-            <bid-grid :players="global.players" :currentBidder="currentBidder"></bid-grid>
-            <hand :interactable="interactable" ></hand>
         </div>
+        <div class="row">
+            <bid-grid :players="global.players" :currentBidder="currentBidder"></bid-grid>
+        </div>
+        <hand></hand>
+    </div>
     `,
     data: function() {
         return {
             global: this.$root.$data.global,
             currentBidder: this.$root.$data.global.players[1],
             bidCheck: undefined, // to clear timeout before destroy
-            interactable: false
         };
     },
     mounted: function() {
@@ -638,13 +641,17 @@ var biddingComp = {
 
 var reduceComp = {
     template: `
-        <div>
-            <cheat-sheet></cheat-sheet>
-            <banner :player="global.leader" ></banner>
-            <scoreboard></scoreboard>
-            <cat></cat>
-            <hand :interactable="interactable" ></hand>
-            <button @click="postReady" :disabled="ready" >Ready</button>
+        <div class="container">
+            <div class="row">
+                <cheat-sheet></cheat-sheet>
+                <banner :player="global.leader"></banner>
+                <scoreboard></scoreboard>
+            </div>
+            <div class="row">
+                <cat></cat>
+            </div>
+            <hand></hand>
+            <button @click="postReady" :disabled="ready">Ready</button>
         </div>
     `,
     data: function() {
@@ -652,7 +659,6 @@ var reduceComp = {
             global: this.$root.$data.global,
             ready: false,
             waitCheck: undefined, // for clearing timeout on destroy
-            interactable: true
         };
     },
     methods: {
@@ -681,9 +687,11 @@ var reduceComp = {
 
 var playComp = {
     template: `
-        <div>
-            <cheat-sheet></cheat-sheet>
-            <scoreboard></scoreboard>
+        <div class="container">
+            <div class="row">
+                <cheat-sheet></cheat-sheet>
+                <scoreboard></scoreboard>
+            </div>
             <play></play>
             <hand></hand>
         </div>
@@ -718,8 +726,10 @@ var playComp = {
 
 var endComp = { // if end of game to login stage, if end of round to connecting stage
     template: `
+    <div>
         <button v-if="endOfGame" @click="newGame" >New Game</button>
         <button v-else @click="nextRound" >Next Round</button>
+    </div>
     `,
     data: function() {
         return {
