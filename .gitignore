@@ -10,3 +10,4 @@ logs
 /project/target
 *gradle*
 /app/frontend/node_modules
+npm-debug.log

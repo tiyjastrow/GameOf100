@@ -14,6 +14,7 @@ class HomeController @Inject()(environment: Environment)(ws: WSClient)(implicit 
     def index = Assets.at("/public", "index.html")
 
     def bundle(file:String) = environment.mode match {
+        // If Development, get from node server
         case Mode.Dev => Action.async {
             ws.url("http://localhost:8080/bundles/" + file).get().map { response =>
                 Ok(response.body)
