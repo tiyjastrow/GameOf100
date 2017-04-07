@@ -1,5 +1,5 @@
 <template>
-    <div>Hello Everybody</div>
+    <div class="card seven-of-hearts"></div>
 </template>
 
 <script>
