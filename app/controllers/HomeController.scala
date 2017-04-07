@@ -1,24 +1,25 @@
 package controllers
 
 import javax.inject._
+
 import play.api._
+import play.api.libs.ws.WSClient
 import play.api.mvc._
 
-/**
- * This controller creates an `Action` to handle HTTP requests to the
- * application's home page.
- */
-@Singleton
-class HomeController @Inject() extends Controller {
+import scala.concurrent.ExecutionContext
 
-  /**
-   * Create an Action to render an HTML page.
-   *
-   * The configuration in the `routes` file means that this method
-   * will be called when the application receives a `GET` request with
-   * a path of `/`.
-   */
-  def index = Action { implicit request =>
-    Ok(views.html.index())
-  }
+@Singleton
+class HomeController @Inject()(environment: Environment)(ws: WSClient)(implicit ec: ExecutionContext) extends Controller {
+
+    def index = Assets.at("/public", "index.html")
+
+    def bundle(file:String) = environment.mode match {
+        case Mode.Dev => Action.async {
+            ws.url("http://localhost:8080/bundles/" + file).get().map { response =>
+                Ok(response.body)
+            }
+        }
+        // If Production, use build files.
+        case Mode.Prod => Assets.at("public/bundles", file)
+    }
 }
