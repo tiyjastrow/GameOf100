@@ -28,13 +28,14 @@ case object Joker extends Rank { val rank = "joker" }
 
 case class Card(suit: Suit, rank: Rank)
 
-class Deck (val cards: List[Card]) {
+class Deck (var cards: List[Card]) {
 
     def shuffle: Deck = Deck(Random.shuffle(this.cards))
 
-    def deal(amount: Int): (List[Card], Deck) = {
+    def deal(amount: Int): List[Card] = {
         val (dealt, remaining) = this.cards.splitAt(amount)
-        (dealt, Deck(remaining))
+        this.cards = remaining
+        dealt
     }
 }
 

@@ -1,6 +1,6 @@
 package models
 
-class Game (name: String) {
+class Game (val name: String) {
     val player1 = Player(1)
     val player2 = Player(2)
     val player3 = Player(3)
@@ -14,12 +14,10 @@ class Game (name: String) {
     val scoreboard: Scoreboard = new Scoreboard()
 
     def deal(): Unit = {
-        var deck = Deck().shuffle
+        val deck = Deck().shuffle
         players.foreach(player => {
-            val t = deck.deal(12)
-            player.hand = t._1
-            deck = t._2
+            player.hand = deck.deal(12)
         })
-        cat = deck.deal(5)._1
+        cat = deck.deal(5)
     }
 }

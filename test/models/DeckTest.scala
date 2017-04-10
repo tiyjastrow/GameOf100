@@ -12,9 +12,9 @@ class DeckTest extends PlaySpec {
 
             "be dealable" in {
                 val deck = Deck()
-                val (hand, remainingDeck) = deck.deal(12)
+                val hand = deck.deal(12)
                 hand.length mustEqual 12
-                remainingDeck.cards.length mustEqual 53 - 12
+                deck.cards.length mustEqual 53 - 12
             }
         }
     }
