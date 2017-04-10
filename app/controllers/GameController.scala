@@ -9,7 +9,7 @@ import play.api.mvc._
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class HomeController @Inject()(environment: Environment)(ws: WSClient)(implicit ec: ExecutionContext) extends Controller {
+class GameController @Inject()(environment: Environment)(ws: WSClient)(implicit ec: ExecutionContext) extends Controller {
 
     def index = Assets.at("/public", "index.html")
 
