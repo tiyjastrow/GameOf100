@@ -1,6 +1,7 @@
 import Errors from './Errors';
+import axios from 'axios';
 
-class Form {
+export default class Form {
     constructor(data) {
         this.originalData = data;
         for (let field in data) {
@@ -17,7 +18,7 @@ class Form {
     }
 
     submit(url, params) {
-        var data = this.getData();
+        let data = this.getData();
         if (params) {
             data = {params: params, data: data};
         }

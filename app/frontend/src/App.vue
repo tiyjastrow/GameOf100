@@ -1,5 +1,5 @@
 <template>
-<component :is="store.state.stage"></component>
+<component :is="this.$store.state.stage"></component>
 </template>
 
 <script>

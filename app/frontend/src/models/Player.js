@@ -1,4 +1,4 @@
-class Player {
+export default class Player {
     constructor(number) {
         this.number = number;
         this.name = "Player " + number;

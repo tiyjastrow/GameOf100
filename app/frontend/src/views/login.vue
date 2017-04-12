@@ -25,6 +25,8 @@
 
 <script>
 import Form from '../models/Form';
+import axios from 'axios';
+
 
 export default {
     data() {
@@ -47,7 +49,7 @@ export default {
             this.joinGame.submit("/join-game")
                 .then(data => {
                     this.$store.state.user = this.$store.state.players[data.user];
-                    this.$store.state.name = data.name;
+                    this.$store.state.username = data.username;
                     this.$store.state.game = data.game;
                     this.$store.state.stage = "connecting";
                 });
