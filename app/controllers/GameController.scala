@@ -4,7 +4,6 @@ import javax.inject._
 
 import models.Game
 import play.api._
-import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json._
 import play.api.libs.ws.WSClient
 import play.api.mvc._
@@ -44,30 +43,12 @@ class GameController @Inject()(environment: Environment)(ws: WSClient)(implicit 
             case Some(g) => g.joinGame(username)
             case None => None
         }
-        val responseData = Map("username" -> username, "game" -> gameName)
 
         joinResult match {
-            case Some(result) => Ok(Json.toJson(responseData + ("user" -> result.toString)))
+            case Some(result) => {
+                Ok(Json.toJson(Map("username" -> username, "game" -> gameName, "user" -> result.toString)))
+            }
             case None => BadRequest("Game not found or full")
         }
-//        implicit val writeAnyMapFormat = new Writes[Map[String, Any]] {
-//            def writes(map: Map[String, Any]): JsValue = {
-//                Json.obj(map.map {
-//                    case (s, a) => {
-//                        val ret: (String, JsValueWrapper) = a match {
-//                            case _: String => s -> JsString(a.asInstanceOf[String])
-//                            case _: java.util.Date => s -> JsString(a.asInstanceOf[String])
-//                            case _: Int => s -> JsString(a.toString)
-//                            case _: java.lang.Double => s -> JsString(a.toString)
-//                            case None => s -> JsNull
-//                            case JsArray(elements) => s -> JsArray(elements)
-//                            case _ => s -> JsArray(a.asInstanceOf[List[Int]].map(JsNumber(_)))
-//                        }
-//                        ret
-//                    }
-//                }.toSeq: _*)
-//
-//            }
-//        }
     }
 }
