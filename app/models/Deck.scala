@@ -43,5 +43,6 @@ object Deck {
     val suits = List(Diamonds, Hearts, Spades, Clubs)
     val ranks = List(Ace, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King)
 
+    // If no parameters are given, create a new deck of cards and add a joker to it
     def apply(cards: List[Card] = Card(NoSuit, Joker) :: (for (s <- suits; r <- ranks) yield Card(s, r))): Deck = new Deck(cards)
 }

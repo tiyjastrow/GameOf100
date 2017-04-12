@@ -7,7 +7,7 @@
     export default {
         name: 'app',
         components: {
-            'app-login': login
+            'login': login
         }
     }
 </script>
