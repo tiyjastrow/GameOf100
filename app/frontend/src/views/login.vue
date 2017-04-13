@@ -46,7 +46,7 @@ export default {
     },
     methods: {
         joinGameSubmit() {
-            this.joinGame.submit("/join-game")
+            this.joinGame.submit("/game")
                 .then(data => {
                     this.$store.state.user = this.$store.state.players[data.user];
                     this.$store.state.username = data.username;
