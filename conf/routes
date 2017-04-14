@@ -15,3 +15,7 @@ GET     /bundles/*file              controllers.GameController.bundle(file)
 GET     /games                      controllers.GameController.getGames
 
 POST    /game                       controllers.GameController.joinGame
+
+POST    /connected                  controllers.GameController.connected
+
+GET     /players                    controllers.GameController.getConnections

@@ -17,7 +17,7 @@
             };
         },
         mounted() {
-            axios.post('/connected', {params: {game: this.$store.state.game, player: this.$store.state.user.number}});
+            this.$store.dispatch('connected');
         },
         computed: mapGetters({'numOfConnectedPlayers': 'connectedPlayers'}),
         watch: {
@@ -26,6 +26,9 @@
                     this.$store.commit('setStage', 'bidding');
                 }
             }
+        },
+        created() {
+            this.$store.dispatch('getConnections');
         }
     }
 

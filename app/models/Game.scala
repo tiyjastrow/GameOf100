@@ -1,10 +1,10 @@
 package models
 
 class Game(val name: String) {
-    val player1 = new Player(1)
-    val player2 = new Player(2)
-    val player3 = new Player(3)
-    val player4 = new Player(4)
+    val player1 = Player(1)
+    val player2 = Player(2)
+    val player3 = Player(3)
+    val player4 = Player(4)
 
     val players = List(player1, player2, player3, player4)
 
@@ -25,4 +25,6 @@ class Game(val name: String) {
             case None => None // Do nothing and return None
         }
     }
+
+    def connected(playerNumber: Int): Unit = players(playerNumber - 1).setConnected()
 }

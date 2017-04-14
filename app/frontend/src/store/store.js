@@ -18,8 +18,7 @@ export const store = new Vuex.Store({
         },
         user: undefined,
         game: '',
-        games: [],
-        timeoutHandle: null
+        games: []
     },
     getters: {
         stage: state => {
@@ -64,6 +63,9 @@ export const store = new Vuex.Store({
                 });
         },
         getConnections({state, commit, dispatch}) {
+            if (state.stage != "connecting") {
+                return;
+            }
             axios.get('/players', {params: {game: state.game}})
                 .then( ({ data }) => {
                     data.forEach(player => {
@@ -71,7 +73,10 @@ export const store = new Vuex.Store({
                     });
                 });
 
-            state.timeoutHandle = setTimeout(dispatch('getConnections'), 5000);
+            setTimeout(dispatch('getConnections'), 5000);
+        },
+        connected({state}) {
+            axios.post('/connected', {params: {game: state.game, player: state.user.number}});
         }
     }
 

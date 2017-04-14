@@ -21,13 +21,13 @@ libraryDependencies ++= Seq(
 // play.sbt.routes.RoutesKeys.routesImport += "com.theironyard.binders._"
 
 // Starts: Webpack build task
-//val webpackBuild = taskKey[Unit]("Webpack build task.")
-//webpackBuild := { Process("npm run build", file("./app/frontend")) ! }
-//(packageBin in Universal) <<= (packageBin in Universal) dependsOn webpackBuild
+val webpackBuild = taskKey[Unit]("Webpack build task.")
+webpackBuild := { Process("npm run build", file("./app/frontend")) ! }
+(packageBin in Universal) <<= (packageBin in Universal) dependsOn webpackBuild
 // Ends.
 
 
 // Starts: Webpack server process when running locally and build actions for productionbundle
-//lazy val frontendDirectory = baseDirectory {_ / "app/frontend"}
-//PlayKeys.playRunHooks <+= frontendDirectory.map(base => WebpackServer(base))
+lazy val frontendDirectory = baseDirectory {_ / "app/frontend"}
+PlayKeys.playRunHooks <+= frontendDirectory.map(base => WebpackServer(base))
 // Ends.

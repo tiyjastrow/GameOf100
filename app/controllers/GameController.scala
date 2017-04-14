@@ -51,4 +51,24 @@ class GameController @Inject()(environment: Environment)(ws: WSClient)(implicit 
             case None => BadRequest("Game not found or full")
         }
     }
+
+    def connected = Action { request =>
+        val json = request.body.asJson.get
+        val gameName = (json \ "game").as[String]
+        val playerNumber = (json \ "player").as[Int]
+
+        games.find(_.name == gameName)
+            .get
+            .connected(playerNumber)
+        Ok
+    }
+
+    def getConnections = Action { request =>
+        val json = request.body.asJson.get
+        val game = (json \ "game").as[String]
+        Ok(Json.toJson(games.find(_.name == game)
+                            .get
+                            .players
+                            .filter(_.connected)))
+    }
 }

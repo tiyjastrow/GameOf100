@@ -1,26 +1,13 @@
 <template>
-    <form class="form-horizontal" style="margin-top: 100px" @submit.prevent="joinGameSubmit">
-        <div class="form-group">
-            <label class="col-md-1 col-md-offset-2 control-label">Name</label>
-            <div class="col-md-6">
-                <input type="text" class="form-control" v-model="joinGame.username" placeholder="Enter a unique name"
-                       required>
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="col-md-1 col-md-offset-2 control-label">Games</label>
-            <div class="col-md-6">
-                <select class="form-control" v-model="joinGame.game" required>
-                    <option selected disabled value="">Choose a game</option>
-                    <option v-for="game in $store.state.games"> {{ game }}</option>
-                </select>
-            </div>
-        </div>
-        <div class="form-group">
-            <div class="col-md-1 col-md-offset-8">
-                <button class="btn btn-default" type="submit">Join Game</button>
-            </div>
-        </div>
+    <form class="form-horizontal" @submit.prevent="joinGameSubmit">
+        <input type="text" v-model="joinGame.username" placeholder="Enter a unique name" required>
+        <label>Games
+            <select v-model="joinGame.game" required>
+                <option selected disabled value="">Choose a game</option>
+                <option v-for="game in $store.state.games"> {{ game }}</option>
+            </select>
+        </label>
+        <button type="submit">Join Game</button>
     </form>
 </template>
 
@@ -28,7 +15,6 @@
     import Form from '../models/Form';
     import axios from 'axios';
 
-    // TODO move games request to vuex
     export default {
         data() {
             return {
