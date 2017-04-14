@@ -18,4 +18,4 @@ POST    /game                       controllers.GameController.joinGame
 
 POST    /connected                  controllers.GameController.connected
 
-GET     /players                    controllers.GameController.getConnections
+GET     /players                    controllers.GameController.getConnections(gameName: String)

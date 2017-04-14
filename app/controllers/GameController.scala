@@ -2,7 +2,7 @@ package controllers
 
 import javax.inject._
 
-import models.Game
+import models.{Game, Player}
 import play.api._
 import play.api.libs.json._
 import play.api.libs.ws.WSClient
@@ -54,21 +54,19 @@ class GameController @Inject()(environment: Environment)(ws: WSClient)(implicit 
 
     def connected = Action { request =>
         val json = request.body.asJson.get
-        val gameName = (json \ "game").as[String]
-        val playerNumber = (json \ "player").as[Int]
-
+        val gameName = (json \ "gameName").as[String]
+        val playerNumber = (json \ "playerNumber").as[Int]
         games.find(_.name == gameName)
             .get
             .connected(playerNumber)
         Ok
     }
 
-    def getConnections = Action { request =>
-        val json = request.body.asJson.get
-        val game = (json \ "game").as[String]
-        Ok(Json.toJson(games.find(_.name == game)
+    def getConnections(gameName: String) = Action {
+        val json: List[Map[String, String]] = games.find(_.name == gameName)
                             .get
                             .players
-                            .filter(_.connected)))
+                            .map(player=> Map("number" -> player.number.toString, "connected" -> player.connected.toString, "name" -> player.name))
+        Ok(Json.toJson(json))
     }
 }

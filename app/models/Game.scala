@@ -26,5 +26,5 @@ class Game(val name: String) {
         }
     }
 
-    def connected(playerNumber: Int): Unit = players(playerNumber - 1).setConnected()
+    def connected(playerNumber: Int): Unit = this.players(playerNumber - 1).setConnected()
 }
