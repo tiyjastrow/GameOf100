@@ -21,7 +21,7 @@ class Game(val name: String) {
 
     def joinGame(username: String): Option[Int] = {
         players.find(!_.claimed) match {
-            case Some(player) => player.claimedBy(username); Some(player.number) // Claim player and return success
+            case Some(player) => player.claimedBy(username); Some(player.number) // Claim player and return player #
             case None => None // Do nothing and return None
         }
     }
