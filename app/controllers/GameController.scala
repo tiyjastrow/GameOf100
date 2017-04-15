@@ -29,14 +29,14 @@ class GameController @Inject()(environment: Environment)(ws: WSClient)(implicit 
     }
 
     def getGames = Action {
-        val gameNames: List[String] = games.map(_.name)
-        Ok(Json.toJson(gameNames))
+        val gameReturn: List[JsObject] = games.map(game => Json.obj("name" -> game.name, "numOfPlayers" -> game.numOfPlayers))
+        Ok(Json.toJson(gameReturn))
     }
 
     def joinGame = Action { request =>
         val json = request.body.asJson.get
         val username = (json \ "username").as[String]
-        val gameName = (json \ "game").as[String]
+        val gameName = (json \ "gameName").as[String]
 
         val game = games.find(_.name == gameName)
         val joinResult: Option[Int] = game match {
@@ -46,7 +46,7 @@ class GameController @Inject()(environment: Environment)(ws: WSClient)(implicit 
 
         joinResult match {
             case Some(result) => {
-                Ok(Json.toJson(Map("username" -> username, "game" -> gameName, "user" -> result.toString)))
+                Ok(Json.obj("username" -> username, "gameName" -> gameName, "userNumber" -> result))
             }
             case None => BadRequest("Game not found or full")
         }

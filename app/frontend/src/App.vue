@@ -24,6 +24,7 @@
             update() {
                 switch (this.state.stage) {
                     case "login":
+                        update.updateGameList();
                         break;
                     case "connecting":
                         break;

@@ -13,6 +13,8 @@ class Game(val name: String) {
     var play: List[Card] = List()
     val scoreboard: Scoreboard = new Scoreboard()
 
+    def numOfPlayers: Int = players.count(_.connected)
+
     def deal(): Unit = {
         val deck = Deck().shuffle
         players.foreach(_.hand = deck.deal(12))

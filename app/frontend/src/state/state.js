@@ -9,7 +9,9 @@ const state = {
         4: new Player(4)
     },
     user: undefined,
-    username: ''
+    username: '',
+    games: [],
+    gameName: ''
 };
 
 export default state;
