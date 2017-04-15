@@ -62,11 +62,12 @@ class GameController @Inject()(environment: Environment)(ws: WSClient)(implicit 
         Ok
     }
 
+    // /players GET
     def getConnections(gameName: String) = Action {
-        val json: List[Map[String, String]] = games.find(_.name == gameName)
-                            .get
-                            .players
-                            .map(player=> Map("number" -> player.number.toString, "connected" -> player.connected.toString, "name" -> player.name))
-        Ok(Json.toJson(json))
+        val json = Json.toJson(games.find(_.name == gameName)
+                            .get.players
+                            .filter(_.connected)
+                            .map(player => Json.obj("name" -> player.name, "number" -> player.number)))
+        Ok(json)
     }
 }

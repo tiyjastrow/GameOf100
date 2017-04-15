@@ -4,8 +4,9 @@
 
 <script>
     import state from './state/state';
-    import login from './views/login.vue';
     import update from './state/update';
+    import login from './views/login.vue';
+    import connecting from './views/connecting.vue';
 
     export default {
         name: 'app',
@@ -15,7 +16,8 @@
             };
         },
         components: {
-            login
+            login,
+            connecting
         },
         created() {
             setInterval(this.update, 5000);
@@ -27,6 +29,7 @@
                         update.updateGameList();
                         break;
                     case "connecting":
+                        update.getConnections();
                         break;
                     case "bidding":
                         break;

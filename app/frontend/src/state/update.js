@@ -8,6 +8,20 @@ const update = {
             .then(({data}) => {
                 state.games = data;
             });
+    },
+
+    notifyConnected() {
+        axios.post('/connected', {gameName: state.gameName, playerNumber: state.user.number});
+    },
+
+    getConnections() {
+        axios.get('/players', {params: {gameName: state.gameName}})
+            .then(({data}) => {
+                data.forEach(player => {
+                    state.players[player.number].name = player.name;
+                    state.players[player.number].connected = true;
+                })
+            });
     }
 
 };
