@@ -11,7 +11,10 @@ const state = {
     user: undefined,
     username: '',
     games: [],
-    gameName: ''
+    gameName: '',
+    currentTurn: undefined,
+    leader: undefined,
+    hand: []
 };
 
 export default state;

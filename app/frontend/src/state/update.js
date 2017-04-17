@@ -22,8 +22,14 @@ const update = {
                     state.players[player.number].connected = true;
                 })
             });
-    }
+    },
 
+    getHand() {
+        axios.get('/hand', {params: {gameName: state.gameName, playerNumber: state.user.number}})
+            .then(({data}) => {
+                state.hand = data;
+            })
+    }
 };
 
 export default update;

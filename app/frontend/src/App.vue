@@ -7,6 +7,7 @@
     import update from './state/update';
     import login from './views/login.vue';
     import connecting from './views/connecting.vue';
+    import bidding from './views/bidding.vue';
 
     export default {
         name: 'app',
@@ -17,7 +18,8 @@
         },
         components: {
             login,
-            connecting
+            connecting,
+            bidding
         },
         created() {
             setInterval(this.update, 5000);

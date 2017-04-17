@@ -14,10 +14,11 @@ import scala.concurrent.ExecutionContext
 class GameController @Inject()(environment: Environment)(ws: WSClient)(implicit ec: ExecutionContext) extends Controller {
 
     var games: List[Game] = List(new Game("game1"), new Game("game2"), new Game("game23"))
+    games.foreach(_.deal())
 
     def index = Assets.at("/public", "index.html")
 
-    def bundle(file:String) = environment.mode match {
+    def bundle(file: String) = environment.mode match {
         // If Development, get from node server
         case Mode.Dev => Action.async {
             ws.url("http://localhost:8080/bundles/" + file).get().map { response =>
@@ -65,9 +66,24 @@ class GameController @Inject()(environment: Environment)(ws: WSClient)(implicit 
     // /players GET
     def getConnections(gameName: String) = Action {
         val json = Json.toJson(games.find(_.name == gameName)
-                            .get.players
-                            .filter(_.connected)
-                            .map(player => Json.obj("name" -> player.name, "number" -> player.number)))
+            .get.players
+            .filter(_.connected)
+            .map(player => Json.obj("name" -> player.name, "number" -> player.number)))
         Ok(json)
+    }
+
+    def getHand(gameName: String, playerNumber: Int) = Action {
+        val game: Option[Game] = games.find(_.name == gameName)
+        val player: Option[Player] = game match {
+            case Some(g) => g.players.find(_.number == playerNumber)
+            case None => None
+        }
+        player match {
+            case Some(p) => Ok(Json.toJson(p.hand
+                .map(card => Json.obj("name" -> card.name,
+                    "suit" -> card.suit.suit,
+                    "rank" -> card.rank.rank))))
+            case None => BadRequest
+        }
     }
 }

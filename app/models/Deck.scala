@@ -2,14 +2,14 @@ package models
 
 import scala.util.Random
 
-sealed trait Suit { def suit: Option[String] }
+sealed trait Suit {def suit: Option[String]}
 case object Diamonds extends Suit { val suit = Some("diamonds") }
 case object Hearts extends Suit { val suit = Some("hearts") }
 case object Spades extends Suit { val suit = Some("spades") }
 case object Clubs extends Suit { val suit = Some("clubs") }
 case object NoSuit extends Suit {val suit = None }
 
-sealed trait Rank { def rank: String }
+sealed trait Rank {def rank: String}
 case object Ace extends Rank { val rank = "ace" }
 case object Two extends Rank { val rank = "two" }
 case object Three extends Rank { val rank = "three" }
@@ -26,7 +26,12 @@ case object King extends Rank { val rank = "king" }
 case object Joker extends Rank { val rank = "joker" }
 
 
-case class Card(suit: Suit, rank: Rank)
+case class Card(suit: Suit, rank: Rank) {
+    val name: String = this.rank match {
+        case Joker => this.rank.rank
+        case _ => this.rank.rank + "-of-" + this.suit.suit.get
+    }
+}
 
 class Deck (var cards: List[Card]) {
 

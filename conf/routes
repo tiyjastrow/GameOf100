@@ -19,3 +19,5 @@ POST    /game                       controllers.GameController.joinGame
 POST    /connected                  controllers.GameController.connected
 
 GET     /players                    controllers.GameController.getConnections(gameName: String)
+
+GET     /hand                       controllers.GameController.getHand(gameName: String, playerNumber: Int)
