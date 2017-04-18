@@ -40,6 +40,7 @@
                         state.username = data.username;
                         state.gameName = data.gameName;
                         state.user = state.players[data.userNumber];
+                        update.notifyConnected(); // moved from connecting.vue to notify before getConnections is run
                         state.stage = "connecting";
                     })
                     .catch(errorMsg => {

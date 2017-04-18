@@ -86,4 +86,16 @@ class GameController @Inject()(environment: Environment)(ws: WSClient)(implicit 
             case None => BadRequest
         }
     }
+
+    def getTurn(gameName: String) = Action {
+        val game: Option[Game] = games.find(_.name == gameName)
+        val turn: Option[Player] = game match {
+            case Some(g) => Some(g.getTurn)
+            case None => None
+        }
+        turn match {
+            case Some(p) => Ok(Json.obj("playerNumber" -> p.number))
+            case None => BadRequest
+        }
+    }
 }

@@ -12,8 +12,7 @@ const state = {
     username: '',
     games: [],
     gameName: '',
-    currentTurn: undefined,
-    leader: undefined,
+    turn: undefined,
     hand: []
 };
 

@@ -11,6 +11,8 @@ class Game(val name: String) {
     var trump: Suit = NoSuit
     var cat: List[Card] = List()
     var play: List[Card] = List()
+    var leader: Player = player1
+    var currentTurn: Player = leader
     val scoreboard: Scoreboard = new Scoreboard()
 
     def numOfPlayers: Int = players.count(_.connected)
@@ -29,4 +31,6 @@ class Game(val name: String) {
     }
 
     def connected(playerNumber: Int): Unit = this.players(playerNumber - 1).setConnected()
+
+    def getTurn: Player = this.currentTurn
 }

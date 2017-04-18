@@ -29,6 +29,13 @@ const update = {
             .then(({data}) => {
                 state.hand = data;
             })
+    },
+
+    getTurn() {
+        axios.get('/player', {params: {gameName: state.gameName}})
+            .then(({data}) => {
+                state.turn = state.players[data.playerNumber];
+            });
     }
 };
 

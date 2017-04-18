@@ -17,8 +17,7 @@
                 state
             };
         },
-        created() {
-            update.notifyConnected();
+        mounted() {
             update.getConnections();
         },
         computed: {

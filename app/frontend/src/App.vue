@@ -34,6 +34,7 @@
                         update.getConnections();
                         break;
                     case "bidding":
+                        update.getTurn();
                         break;
                     case "reduce":
                         break;
