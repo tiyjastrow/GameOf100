@@ -98,4 +98,17 @@ class GameController @Inject()(environment: Environment)(ws: WSClient)(implicit 
             case None => BadRequest
         }
     }
+
+    def takeBid(gameName: String, playerNumber: Int) = Action { request =>
+        val json = request.body.asJson.get
+        val bid = (json \ "bid").as[Int]
+        games
+            .find(_.name == gameName)
+            .get
+            .players
+            .find(_.number == playerNumber)
+            .get
+            .setBid(bid)
+        Ok
+    }
 }

@@ -6,6 +6,7 @@ case class Player (number: Int) {
     var name: String = "Player " + this.number
 
     var hand: List[Card] = _
+    var bid: Int = 0
     var claimed: Boolean = false
     var connected: Boolean = false
 
@@ -15,6 +16,8 @@ case class Player (number: Int) {
     }
 
     def setConnected(): Unit = this.connected = true
+
+    def setBid(bid: Int) = this.bid = bid
 }
 
 object Player {
