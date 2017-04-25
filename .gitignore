@@ -1,2 +1,14 @@
-.idea
-*.iml
+logs
+/target
+/.idea
+/.idea_modules
+/.classpath
+/.project
+/.settings
+/RUNNING_PID
+/project/project
+/project/target
+*gradle*
+/app/frontend/node_modules
+npm-debug.log
+app/frontend/target
