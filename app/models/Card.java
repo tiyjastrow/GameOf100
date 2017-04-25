@@ -1,6 +1,14 @@
 package models;
 
 public class Card {
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     String name;
     int suit;
     int rank;
@@ -59,6 +67,27 @@ public class Card {
         }
     }
 
+    public Boolean isJoker() { return suit == 0; }
+    public Boolean isBlack() { return (suit == 1 || suit == 4); }
+    public Boolean isRed() { return (suit == 2 || suit == 3); }
+
     public Card() {
+    }
+
+    public int getSuit() {
+        return suit;
+    }
+
+    public void setSuit(int suit) {
+        this.suit = suit;
+    }
+
+    public int getRank() {
+
+        return rank;
+    }
+
+    public void setRank(int rank) {
+        this.rank = rank;
     }
 }
