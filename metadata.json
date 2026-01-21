@@ -1,0 +1,9 @@
+
+{
+  "name": "Nexus Cards: P2P Multiplayer",
+  "description": "A serverless, peer-to-peer multiplayer card game engine with real-time video, scoring, and host-moderated lobby.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
